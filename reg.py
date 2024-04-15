@@ -5,14 +5,33 @@
 # Authors: Wangari Karani & Alfred Ripoll
 #-----------------------------------------------------------------------
 
-import cmv
+# import cmv
 import sys
+import queue 
 import socket
 import pickle
+import dbquery 
 import argparse
+import threading
 import PyQt5.QtWidgets
 import PyQt5.QtCore
 import PyQt5.QtGui
+
+#-----------------------------------------------------------------------
+
+def get_arguments():
+    if len(sys.argv) != 3:
+        print('Usage: reg host port', file = sys.stderr)
+        sys.exit(1)
+
+    try:
+		port = int(args.port)
+		delay = int(args.delay)
+	except Exception:
+		print(sys.argv[0] + ': Port/Delay must be an integer', file=sys.stderr)
+		sys.exit(2)
+
+#-----------------------------------------------------------------------
 
 def create_control_frame():
     ## Label Widgets
