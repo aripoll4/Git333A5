@@ -99,7 +99,7 @@ class DBQuery:
                     details += 'Days: ' + str(row[1]) + '\n'
                     details += 'Start Time: ' + str(row[2]) + '\n'
                     details += 'End Time: ' + str(row[3]) + '\n'
-                    details += 'Building: ' str(row[4]) + '\n'
+                    details += 'Building: ' + str(row[4]) + '\n'
                     details += 'Room: ' + str(row[5]) + '\n\n'
                     
 
