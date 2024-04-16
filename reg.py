@@ -107,7 +107,11 @@ def create_central_frame(control_frame, output_frame):
 	output_frame = create_output_frame()
 
 	central_layout = PyQt5.QtWidgets.QGridLayout()
-	central_layout.addWidget(control_frame, 0, 0)
+	central_layout.setContentsMargins(0, 0, 0, 0)    # set contents margins (not default)
+	central_layout.setSpacing(0)    
+	central_layout.setRowStretch(0, 0)
+	central_layout.setRowStretch(1, 0)                 
+	central_layout.addWidget(control_frame, 0, 0, 1, 3)
 	central_layout.addWidget(output_frame, 1, 0)
 	central_frame = PyQt5.QtWidgets.QFrame() # control frame + output frame
 	central_frame.setLayout(central_layout)
@@ -205,6 +209,7 @@ def main():
 
 	control_frame = create_control_frame()
 	output_frame = create_output_frame()
+	output_frame.setFont(PyQt5.QtGui.QFont('Courier New', 10))
 	central_frame = create_central_frame(control_frame, output_frame)
 
 	# Main Window (Class Search) details
