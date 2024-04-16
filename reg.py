@@ -81,6 +81,7 @@ def create_control_frame():
 	control_layout.setColumnStretch(1, 1)
 	control_layout.setColumnStretch(2, 0)
 	control_layout.setSpacing(6)
+	control_layout.setContentsMargins(0, 0, 0, 0)    # set contents margins (not default)
 
 	control_frame = PyQt5.QtWidgets.QFrame() # top section where we input queries
 	control_frame.setLayout(control_layout)
