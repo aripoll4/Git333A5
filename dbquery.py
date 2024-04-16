@@ -9,6 +9,7 @@ import sys
 import sqlite3
 import contextlib
 import courseoverview
+import course as coursemod
 
 DATABASE_URL = 'file:reg.sqlite?mode=ro'
 
@@ -56,7 +57,7 @@ class DBQuery:
                         crsnum = str(row[2])
                         area = str(row[3])
                         title = str(row[4])
-                        course  = courseoverview.CourseOverview(row[0], row[1], row[2], row[3], row[4])
+                        course  = courseoverview.CourseOverview(clsid, dept, crsnum, area, title)
                         overviews.append(course)
                         row = cursor.fetchone()
                     
@@ -110,7 +111,7 @@ class DBQuery:
                     dept_str += ' ORDER BY dept, coursenum'
                     cursor.execute(dept_str, [classid])
                     dept_row = cursor.fetchone()
-                    depts_crsnum = []
+                    # depts_crsnum = []
 
                     while dept_row is not None:
                         details += 'Dept and Number: ' + str(dept_row[0]) + " " + str(dept_row[1]) + '\n'
@@ -136,7 +137,7 @@ class DBQuery:
                         details += 'Professor: ' + str(profs_row[0]) + '\n'
                         profs_row = cursor.fetchone()
 
-                    return True, crsdetails
+                    return True, details
                     # returns true, and a list of details
         except Exception as ex:
 
