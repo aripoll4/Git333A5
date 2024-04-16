@@ -8,7 +8,6 @@
 import sys
 import sqlite3
 import contextlib
-import coursedetails
 import courseoverview
 
 DATABASE_URL = 'file:reg.sqlite?mode=ro'
