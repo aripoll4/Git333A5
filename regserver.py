@@ -24,51 +24,6 @@ def consume_cpu_time(delay):
 
 #-----------------------------------------------------------------------
 
-def handle_client(sock, delay):
-	# Make some changes to this 
-	# query = Query(None, None, None, None, None, None)
-	flo = sock.makefile(mode='rb')
-	# flo.write(query)
-	info = pickle.load(flo)
-
-	try:
-		portflow = sock.makefile(mode = 'wb')
-
-		if info.get_query_type() == "getDetails":
-			print('Received command: get_details')
-			success, details = dbquery.a1regdetails(info.get_classid())
-			if success:
-				pickle.dump((True, details), portflow)
-			else:
-				print(str(details), file=sys.stderr)
-				pickle.dump((False, details), portflow)
-		else:
-			print('Received command: get_overviews')
-
-			# Simulate a compute bound thread
-			consume_cpu_time(delay)
-
-			success, overviews = dbquery.a1reg(info.get_dept(), info.get_number(), info.get_area(), info.get_title())
-			if success:
-				pickle.dump((True, overviews), portflow)
-			else:
-				print(str(overviews), file=sys.stderr)
-				pickle.dump((False, overviews), portflow)
-
-		portflow.flush()
-		sock.close()
-		print("Closed socket in child thread")
-		print("Exiting child thread: ")
-
-	except Exception as ex:
-		print(ex, file = sys.stderr)
-		portflow = sock.makefile(mode='wb')
-		pickle.dump(ex, portflow)
-		portflow.flush()
-		sys.exit(1)
-
-#-----------------------------------------------------------------------
-
 class ClientHandlerThread (threading.Thread):
 
 	def __init__(self, sock, delay):
@@ -81,15 +36,15 @@ class ClientHandlerThread (threading.Thread):
 
 		flo = self._sock.makefile(mode='rb')
 		# flo.write(query)
-		info = pickle.load(flo)
+		queryinfo = pickle.load(flo)
 
 		with self._sock:
 			try:
 				portflow = self._sock.makefile(mode = 'wb')
 
-				if info.get_query_type() == "getDetails":
+				if queryinfo.get_query_type() == "getDetails":
 					print('Received command: get_details')
-					success, details = dbquery.a1regdetails(info.get_classid())
+					success, details = dbquery.a1regdetails(queryinfo.get_classid())
 					if success:
 						pickle.dump((True, details), portflow)
 					else:
@@ -101,7 +56,7 @@ class ClientHandlerThread (threading.Thread):
 				# Simulate a compute bound thread
 				consume_cpu_time(self._delay)
 
-				success, overviews = dbquery.a1reg(info.get_dept(), info.get_number(), info.get_area(), info.get_title())
+				success, overviews = dbquery.a1reg(queryinfo.get_dept(), queryinfo.get_number(), queryinfo.get_area(), queryinfo.get_title())
 				if success:
 					pickle.dump((True, overviews), portflow)
 				else:
