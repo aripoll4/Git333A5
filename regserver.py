@@ -13,7 +13,7 @@ import pickle
 import dbquery
 import argparse
 import threading
-import multiprocessing
+# import multiprocessing
 
 #-----------------------------------------------------------------------
 
@@ -130,7 +130,7 @@ def main():
 		print(': Usage: python %s port' % sys.argv[0], file=sys.stderr)
 		sys.exit(1)
 
-	print('CPU count:', multiprocessing.cpu_count())
+	# print('CPU count:', multiprocessing.cpu_count())
 
 	parser = argparse.ArgumentParser(description = 'Server for regristrar application', allow_abbrev=False)
 	parser.add_argument('port', type=int, help='the port at which the server should listen')
@@ -162,8 +162,8 @@ def main():
 				client_handler_thread = ClientHandlerThread(sock, delay)
 				client_handler_thread.start()
 
-				process = multiprocessing.Process(target=handle_client, args=[sock, delay])
-				process.start()
+				# process = multiprocessing.Process(target=handle_client, args=[sock, delay])
+				# process.start()
 	except Exception as ex:
 		print(sys.argv[0] + ': ' + str(ex), file=sys.stderr)
 		sys.exit(1)
