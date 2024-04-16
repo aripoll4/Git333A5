@@ -80,6 +80,7 @@ def create_control_frame():
 	control_layout.setColumnStretch(0, 0)
 	control_layout.setColumnStretch(1, 1)
 	control_layout.setColumnStretch(2, 0)
+	control_layout.setSpacing(6)
 
 	control_frame = PyQt5.QtWidgets.QFrame() # top section where we input queries
 	control_frame.setLayout(control_layout)
@@ -91,8 +92,8 @@ def create_output_frame():
 
 	# output frame layout
 	output_layout = PyQt5.QtWidgets.QGridLayout()
-	output_layout.setSpacing(0)                     # set spacing (not default)
 	output_layout.setContentsMargins(0, 0, 0, 0)    # set contents margins (not default)
+	output_layout.setSpacing(0)                     # set spacing (not default)
 	output_layout.addWidget(classes, 0, 0)
 	output_frame = PyQt5.QtWidgets.QFrame() # bottom section where the query output is diaplyed
 	output_frame.setLayout(output_layout)
