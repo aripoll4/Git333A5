@@ -42,9 +42,9 @@ class ClientHandlerThread (threading.Thread):
 			try:
 				portflow = self._sock.makefile(mode = 'wb')
 
-				if queryinfo[0] == "getDetails":
+				if queryinfo[0] == "get_detail":
 					print('Received command: get_details')
-					success, details = dbquery.a1regdetails(queryinfo.get_classid())
+					success, details = dbquery.a1regdetails(queryinfo[1])
 					if success:
 						pickle.dump((True, details), portflow)
 					else:
@@ -53,15 +53,17 @@ class ClientHandlerThread (threading.Thread):
 				else:
 					print('Received command: get_overviews')
 
-				# Simulate a compute bound thread
-				consume_cpu_time(self._delay)
+					# Simulate a compute bound thread
+					consume_cpu_time(self._delay)
 
-				success, overviews = dbquery.a1reg(queryinfo.get_dept(), queryinfo.get_number(), queryinfo.get_area(), queryinfo.get_title())
-				if success:
-					pickle.dump((True, overviews), portflow)
-				else:
-					print(str(overviews), file=sys.stderr)
-					pickle.dump((True, overviews), portflow)
+					querydict = queryinfo[1]
+					success, overviews = dbquery.a1reg(querydict['dept'], querydict['coursenum'], querydict['area'], querydict['title'])
+					
+					if success:
+						pickle.dump((True, overviews), portflow)
+					else:
+						print(str(overviews), file=sys.stderr)
+						pickle.dump((True, overviews), portflow)
 
 				portflow.flush()
 				self._sock.close()

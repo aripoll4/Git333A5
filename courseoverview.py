@@ -6,7 +6,7 @@
 #-----------------------------------------------------------------------
 
 class CourseOverview:
-    def __init__(self, clsid, dept, num, area, title, query_type):
+    def __init__(self, clsid, dept, num, area, title):
         self._clsid = clsid
         self._dept = dept
         self._num = num
@@ -28,6 +28,3 @@ class CourseOverview:
 
     def get_title(self):
         return self._title
-
-    def get_query_type(self):
-        return self._query_type
