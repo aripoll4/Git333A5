@@ -57,12 +57,13 @@ class DBQuery:
                         crsnum = str(row[2])
                         area = str(row[3])
                         title = str(row[4])
-                        course  = courseoverview.CourseOverview(clsid, dept, crsnum, area, title)
+                        course = {'classid': clsid, 'dept': dept, 'coursenum': crsnum, 'area': area, 'title': title}
+                        # course  = courseoverview.CourseOverview(clsid, dept, crsnum, area, title)
                         overviews.append(course)
                         row = cursor.fetchone()
                     
                     return True, overviews
-                    # returns true, and a list of overviews
+                    # returns 'get_overviews', and a list of overviews
 
         except Exception as ex:
             print(ex, file=sys.stderr)

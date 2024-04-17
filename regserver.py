@@ -42,7 +42,7 @@ class ClientHandlerThread (threading.Thread):
 			try:
 				portflow = self._sock.makefile(mode = 'wb')
 
-				if queryinfo.get_query_type() == "getDetails":
+				if queryinfo[0] == "getDetails":
 					print('Received command: get_details')
 					success, details = dbquery.a1regdetails(queryinfo.get_classid())
 					if success:
@@ -61,7 +61,7 @@ class ClientHandlerThread (threading.Thread):
 					pickle.dump((True, overviews), portflow)
 				else:
 					print(str(overviews), file=sys.stderr)
-					pickle.dump((False, overviews), portflow)
+					pickle.dump((True, overviews), portflow)
 
 				portflow.flush()
 				self._sock.close()
@@ -76,7 +76,7 @@ class ClientHandlerThread (threading.Thread):
 				sys.exit(1)
 
 		print('Closed socket in child thread')
-		print('Exiting child thread: ' + info)
+		print('Exiting child thread: ' + queryinfo)
 
 #-----------------------------------------------------------------------
 
