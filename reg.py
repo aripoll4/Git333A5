@@ -17,6 +17,7 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 #-----------------------------------------------------------------------
 
 def get_arguments():
+	
 	parser = argparse.ArgumentParser(description = 'Client for regristrar application', allow_abbrev=False)
 	parser.add_argument("host", type = str, help="the host on which the server is running")
 	parser.add_argument("port", type = int, help="the port at which the server is listening")
@@ -24,8 +25,8 @@ def get_arguments():
 	args = parser.parse_args()
 
 	try:
-		host = args.port
-		port = int(args.delay)
+		host = args.host
+		port = int(args.port)
 	except Exception as ex:
 		print(ex, file=sys.stderr)
 		sys.exit(2)
