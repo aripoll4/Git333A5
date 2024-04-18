@@ -105,9 +105,6 @@ def create_output_frame():
 
 def create_central_frame(control_frame, output_frame):
 	# central frame layout
-	control_frame, _, _, _, _ = create_control_frame()
-	output_frame = create_output_frame()
-
 	central_layout = QtWidgets.QGridLayout()
 	central_layout.setContentsMargins(0, 0, 0, 0)    # set contents margins (not default)
 	central_layout.setSpacing(0)    
