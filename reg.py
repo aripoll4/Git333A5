@@ -12,19 +12,11 @@ import socket
 import pickle
 import argparse
 import threading
-from dbquery import DBQuery
 from PyQt5 import QtGui, QtCore, QtWidgets
 
 #-----------------------------------------------------------------------
 
 def get_arguments():
-	if len(sys.argv) != 3:
-		# print(': Usage: python %s port' % sys.argv[0], file=sys.stderr)
-		print(sys.argv[0] + ': Usage: python %s host' % sys.argv[1] + ' %s port' % sys.argv[2], file=sys.stderr)
-		sys.exit(1)
-
-	# print('CPU count:', multiprocessing.cpu_count())
-
 	parser = argparse.ArgumentParser(description = 'Client for regristrar application', allow_abbrev=False)
 	parser.add_argument("host", type = str, help="the host on which the server is running")
 	parser.add_argument("port", type = int, help="the port at which the server is listening")
@@ -34,8 +26,8 @@ def get_arguments():
 	try:
 		host = args.port
 		port = int(args.delay)
-	except Exception:
-		print(sys.argv[0] + ': Port must be an integer', file=sys.stderr)
+	except Exception as ex:
+		print(ex, file=sys.stderr)
 		sys.exit(2)
 
 	return host, port
@@ -89,8 +81,6 @@ def create_control_frame():
 #-----------------------------------------------------------------------
 
 def create_output_frame():
-	global classes
-
 	# output frame layout
 	output_layout = QtWidgets.QGridLayout()
 	output_layout.setContentsMargins(0, 0, 0, 0)    # set contents margins (not default)
@@ -120,10 +110,6 @@ def create_central_frame(control_frame, output_frame):
 #-----------------------------------------------------------------------
 
 def class_details_slot():
-	global classes
-	global host
-	global port
-
 	course = classes.currentItem()
 	classid = course('classid')
 
@@ -203,16 +189,13 @@ def main():
 
 	global host
 	global port
-	global window
 	global classes
 
 	host, port = get_arguments()
 	
 	app = QtWidgets.QApplication(sys.argv)
 	
-	classes = QtWidgets.QListWidget()
-	#  classes.setFont(QtGui.QFont('Courier New', 10))
-	classes.doubleClicked.connect(class_details_slot)
+	classes = QtWidgets.QListWidget()	
 
 	control_frame, dept_lineedit, crsnum_lineedit, area_lineedit, title_lineedit = create_control_frame()
 	output_frame = create_output_frame()
@@ -261,6 +244,7 @@ def main():
 	crsnum_lineedit.textChanged.connect(debounced_submit_slot)
 	area_lineedit.textChanged.connect(debounced_submit_slot)
 	title_lineedit.textChanged.connect(debounced_submit_slot)
+	classes.doubleClicked.connect(class_details_slot)
 	
 	# Start up
 	window.show()
