@@ -111,7 +111,7 @@ def create_central_frame(control_frame, output_frame):
 #-----------------------------------------------------------------------
 
 def class_details_slot():
-	course = classes.currentItem()
+	course = courses.currentItem()
 	classid = course('classid')
 
 	try:
@@ -174,12 +174,12 @@ def poll_event_queue_helper(event_queue):
 			item = event_queue.get(block=False)
 		except queue.Empty:
 			break
-		classes.clear()
+		courses.clear()
 		successful, overviews = item
 		if successful:
 			for course in overviews:
-				classes.insertItem(course)	
-				classes.setCurrentRow(0)		
+				courses.insertItem(course)	
+				courses.setCurrentRow(0)		
 		else:
 			print(sys.argv[0] + overviews, file=sys.stderr)
 			sys.exit(1)
@@ -191,13 +191,16 @@ def main():
 	global host
 	global port
 	global window
+	global courses
 	global classes
 
 	host, port = get_arguments()
 	
 	app = QtWidgets.QApplication(sys.argv)
 	
-	classes = QtWidgets.QListWidget()	
+	classes = QtWidgets.QListWidget()
+	courses = QtWidgets.QListWidgetItem	
+	classes.addItem(courses)
 
 	control_frame, dept_lineedit, crsnum_lineedit, area_lineedit, title_lineedit = create_control_frame()
 	output_frame = create_output_frame()
