@@ -33,23 +33,23 @@ class ClientHandlerThread (threading.Thread):
 
 	def run(self):
 		print('Spawned child thread')
-
-		flo = self._sock.makefile(mode='rb')
-		# flo.write(query)
-		queryinfo = pickle.load(flo)
-
 		with self._sock:
 			try:
+				flo = self._sock.makefile(mode='rb')
+				# flo.write(query)
+				queryinfo = pickle.load(flo)
 				portflow = self._sock.makefile(mode = 'wb')
 
 				if queryinfo[0] == "get_detail":
-					print('Received command: get_details')
+					print('Received command: get_detail')
+					consume_cpu_time(self._delay)
 					success, details = dbquery.a1regdetails(queryinfo[1])
-					if success:
-						pickle.dump((True, details), portflow)
-					else:
-						print(str(details), file=sys.stderr)
-						pickle.dump((False, details), portflow)
+					pickle.dump((success, details), portflow)
+					# if success:
+					# 	pickle.dump((True, details), portflow)
+					# else:
+					# 	print(str(details), file=sys.stderr)
+					# 	pickle.dump((False, details), portflow)
 				else:
 					print('Received command: get_overviews')
 
@@ -58,12 +58,12 @@ class ClientHandlerThread (threading.Thread):
 
 					querydict = queryinfo[1]
 					success, overviews = dbquery.a1reg(querydict['dept'], querydict['coursenum'], querydict['area'], querydict['title'])
-					
-					if success:
-						pickle.dump((True, overviews), portflow)
-					else:
-						print(str(overviews), file=sys.stderr)
-						pickle.dump((True, overviews), portflow)
+					pickle.dump((True, details), portflow)
+					# if success:
+					# 	pickle.dump((True, overviews), portflow)
+					# else:
+					# 	print(str(overviews), file=sys.stderr)
+					# 	pickle.dump((True, overviews), portflow)
 
 				portflow.flush()
 				self._sock.close()

@@ -66,8 +66,8 @@ class DBQuery:
                     # returns 'get_overviews', and a list of overviews
 
         except Exception as ex:
-            print(ex, file=sys.stderr)
-            return False, ex
+            print(str(ex), file=sys.stderr)
+            return False, str(ex)
 
     #----------------------------------------------------------------------
 
