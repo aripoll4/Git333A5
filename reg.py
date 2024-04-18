@@ -145,31 +145,6 @@ def launch():
 		print(sys.argv[0] + ': End of File', file=sys.stderr)
 		sys.exit(1)
 
-# def submit_button_slot():
-# 	global classes
-# 	global host
-# 	global port
-
-# 	classes.clear()
-# 	try:
-# 		with socket.socket() as sock:
-# 			sock.connect((host, port))
-# 			query_type = "getOverviews"
-# 			_, dept, crsnum, area, title = create_control_frame()
-# 			overviews_query = cmv.Query(query_type, dept.text(), crsnum.text(), area.text(), title.text(), None)
-# 			flo = sock.makefile(mode = 'wb')
-# 			pickle.dump(overviews_query, flo)
-# 			flo.flush()
-
-# 			flo = sock.makefile(mode = 'rb')
-# 			overviews = pickle.load(flo)
-# 			for row in overviews:
-# 				classes.addItem(row)
-# 			flo.flush()
-# 	except EOFError:
-# 		print(sys.argv[0] + ': End of File', file=sys.stderr)
-# 		sys.exit(1)
-
 #-----------------------------------------------------------------------
 
 def class_details_slot():
