@@ -10,7 +10,7 @@ import sys
 import time
 import socket
 import pickle
-import dbquery
+from dbquery import DBQuery
 import argparse
 import threading
 # import multiprocessing
@@ -42,7 +42,7 @@ class ClientHandlerThread (threading.Thread):
 				if queryinfo[0] == "get_detail":
 					print('Received command: get_detail')
 					consume_cpu_time(self._delay)
-					success, details = dbquery.a1regdetails(queryinfo[1])
+					success, details = DBQuery.a1regdetails(queryinfo[1])
 					details_output = [success, details]
 					pickle.dump(details_output, portflow)
 					# if success:
@@ -57,7 +57,7 @@ class ClientHandlerThread (threading.Thread):
 					consume_cpu_time(self._delay)
 
 					querydict = queryinfo[1]
-					success, overviews = dbquery.a1reg(querydict['dept'], querydict['coursenum'], querydict['area'], querydict['title'])
+					success, overviews = DBQuery.a1reg(querydict['dept'], querydict['coursenum'], querydict['area'], querydict['title'])
 					pickle.dump([success, overviews], portflow)
 					# if success:
 					# 	pickle.dump((True, overviews), portflow)

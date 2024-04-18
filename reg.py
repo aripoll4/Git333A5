@@ -203,7 +203,7 @@ def class_details_slot():
 
 class WorkerThread(threading.Thread):
 	
-    def __init__(self, host, port, )
+    def __init__(self, host, port, dept, crsnum, area, title, event_queue):
 
 #-----------------------------------------------------------------------
 
