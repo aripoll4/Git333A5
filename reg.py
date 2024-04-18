@@ -177,13 +177,13 @@ def class_details_slot():
 	global host
 	global port
 
-	classid = classes.currentItem().get_classid()
+	course = classes.currentItem()
+	classid = course('classid')
 
 	try:
 		with socket.socket() as sock:
 			sock.connect((host, port))
-			query_type = "get_detail"
-			details_query = [query_type, classid]
+			details_query = ["get_detail", classid]
 			flo = sock.makefile(mode = 'wb')
 			pickle.dump(details_query, flo)
 			flo.flush()
@@ -204,7 +204,7 @@ class WorkerThread(threading.Thread):
 	def __init__(self, host, port, dept, crsnum, area, title, event_queue):
 		threading.Threading.__init__(self)
 		self._host = host
-		self._port = port
+		self._port = port		
 		self._dept = dept
 		self._coursenum = crsnum
 		self._area = area
@@ -220,8 +220,10 @@ class WorkerThread(threading.Thread):
 			with socket.socket() as sock:
 				sock.connect((self._host, self._port))
 				portflow = sock.makefile(mode='wb')
-				pickle.dump(['get_overviews'(self._dept, self._coursenum, self._area, self._title)], portflow)
+				overviews_query = {'dept': self._dept, 'coursenum': self._coursenum, 'area': self._area, 'title': self._title}
+				pickle.dump(['get_overviews', overviews_query], portflow)
 				portflow.flush()
+
 				flo = sock.makefile(mode='rb')
 				overviews_output = pickle.load(flo)
 			if not self._should_stop:
@@ -232,26 +234,21 @@ class WorkerThread(threading.Thread):
 
 #-----------------------------------------------------------------------
 
-def poll_event_queue_helper(event_queue, books_textedit):
+def poll_event_queue_helper(event_queue):
 	while True:
 		try:
 			item = event_queue.get(block=False)
 		except queue.Empty:
 			break
-		books_textedit.clear()
-		successful, data = item
+		classes.clear()
+		successful, overviews = item
 		if successful:
-			books = data
-			if len(books) == 0:
-				books_textedit.insertPlainText('(None)')
-			else:
-				pattern = '<strong>%s</strong>: %s ($%.2f)<br>'
-				for book in books:
-					books_textedit.insertHtml(pattern % book.to_tuple())
+			for course in overviews:
+				classes.insertItem(course)	
+				classes.setCurrentRow(0)		
 		else:
-			ex = data
-			books_textedit.insertPlainText(ex)
-			books_textedit.repaint()
+			print(sys.argv[0] + overviews, file=sys.stderr)
+			sys.exit(1)
 
 #-----------------------------------------------------------------------
 
@@ -320,8 +317,7 @@ def main():
 	
 	# Start up
 	window.show()
-	submit_slot()
-	classes.setCurrentRow(0)
+	submit_slot()	
 	sys.exit(app.exec_())
 
 #-----------------------------------------------------------------------
