@@ -189,6 +189,7 @@ def main():
 
 	global host
 	global port
+	global window
 	global classes
 
 	host, port = get_arguments()
