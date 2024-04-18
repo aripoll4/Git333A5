@@ -136,7 +136,7 @@ def class_details_slot():
 class WorkerThread(threading.Thread):
 	
 	def __init__(self, host, port, dept, crsnum, area, title, event_queue):
-		threading.Threading.__init__(self)
+		threading.Thread.__init__(self)
 		self._host = host
 		self._port = port		
 		self._dept = dept
