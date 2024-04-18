@@ -58,7 +58,6 @@ class DBQuery:
                         area = str(row[3])
                         title = str(row[4])
                         course = {'classid': clsid, 'dept': dept, 'coursenum': crsnum, 'area': area, 'title': title}
-                        # course  = courseoverview.CourseOverview(clsid, dept, crsnum, area, title)
                         overviews.append(course)
                         row = cursor.fetchone()
                     

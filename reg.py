@@ -10,12 +10,10 @@ import sys
 import queue 
 import socket
 import pickle
-import dbquery
 import argparse
 import threading
-import PyQt5.QtWidgets
-import PyQt5.QtCore
-import PyQt5.QtGui
+from dbquery import DBQuery
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 #-----------------------------------------------------------------------
 
@@ -46,26 +44,26 @@ def get_arguments():
 
 def create_control_frame():
 	## Label Widgets and align them
-	dept_label = PyQt5.QtWidgets.QLabel('Dept: ')
-	dept_label.setAlignment(PyQt5.QtCore.Qt.AlignRight | PyQt5.QtCore.Qt.AlignVCenter)
+	dept_label = QtWidgets.QLabel('Dept: ')
+	dept_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
 
-	crsnum_label = PyQt5.QtWidgets.QLabel('Number: ')
-	crsnum_label.setAlignment(PyQt5.QtCore.Qt.AlignRight | PyQt5.QtCore.Qt.AlignVCenter)
+	crsnum_label = QtWidgets.QLabel('Number: ')
+	crsnum_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
 	
-	area_label = PyQt5.QtWidgets.QLabel('Area: ')
-	area_label.setAlignment(PyQt5.QtCore.Qt.AlignRight | PyQt5.QtCore.Qt.AlignVCenter)
+	area_label = QtWidgets.QLabel('Area: ')
+	area_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
 	
-	title_label = PyQt5.QtWidgets.QLabel('Title: ')
-	title_label.setAlignment(PyQt5.QtCore.Qt.AlignRight | PyQt5.QtCore.Qt.AlignVCenter)
+	title_label = QtWidgets.QLabel('Title: ')
+	title_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
 
 	# LineEdit Widgets
-	dept_lineedit = PyQt5.QtWidgets.QLineEdit()
-	crsnum_lineedit = PyQt5.QtWidgets.QLineEdit()
-	area_lineedit = PyQt5.QtWidgets.QLineEdit()
-	title_lineedit = PyQt5.QtWidgets.QLineEdit()
+	dept_lineedit = QtWidgets.QLineEdit()
+	crsnum_lineedit = QtWidgets.QLineEdit()
+	area_lineedit = QtWidgets.QLineEdit()
+	title_lineedit = QtWidgets.QLineEdit()
 
 	# control frame layout
-	control_layout = PyQt5.QtWidgets.QGridLayout() # uses default spacing & content margins
+	control_layout = QtWidgets.QGridLayout() # uses default spacing & content margins
 
 	control_layout.addWidget(dept_label, 0, 0)
 	control_layout.addWidget(crsnum_label, 1, 0)
@@ -83,7 +81,7 @@ def create_control_frame():
 	control_layout.setSpacing(6)
 	control_layout.setContentsMargins(0, 0, 0, 0)    # set contents margins (not default)
 
-	control_frame = PyQt5.QtWidgets.QFrame() # top section where we input queries
+	control_frame = QtWidgets.QFrame() # top section where we input queries
 	control_frame.setLayout(control_layout)
 
 	return control_frame, dept_lineedit, crsnum_lineedit, area_lineedit, title_lineedit
@@ -94,11 +92,11 @@ def create_output_frame():
 	global classes
 
 	# output frame layout
-	output_layout = PyQt5.QtWidgets.QGridLayout()
+	output_layout = QtWidgets.QGridLayout()
 	output_layout.setContentsMargins(0, 0, 0, 0)    # set contents margins (not default)
 	output_layout.setSpacing(0)                     # set spacing (not default)
 	output_layout.addWidget(classes, 0, 0)
-	output_frame = PyQt5.QtWidgets.QFrame() # bottom section where the query output is diaplyed
+	output_frame = QtWidgets.QFrame() # bottom section where the query output is diaplyed
 	output_frame.setLayout(output_layout)
 
 	return output_frame
@@ -110,14 +108,14 @@ def create_central_frame(control_frame, output_frame):
 	control_frame, _, _, _, _ = create_control_frame()
 	output_frame = create_output_frame()
 
-	central_layout = PyQt5.QtWidgets.QGridLayout()
+	central_layout = QtWidgets.QGridLayout()
 	central_layout.setContentsMargins(0, 0, 0, 0)    # set contents margins (not default)
 	central_layout.setSpacing(0)    
 	central_layout.setRowStretch(0, 0)
 	central_layout.setRowStretch(1, 0)                 
 	central_layout.addWidget(control_frame, 0, 0, 1, 3)
 	central_layout.addWidget(output_frame, 1, 0)
-	central_frame = PyQt5.QtWidgets.QFrame() # control frame + output frame
+	central_frame = QtWidgets.QFrame() # control frame + output frame
 	central_frame.setLayout(central_layout)
 
 	return central_frame
@@ -132,8 +130,8 @@ def launch():
 	try:
 		with socket.socket() as sock:
 			sock.connect((host, port))
-			query_type = "getOverviews"
-			overviews_query = cmv.Query(query_type, None, None, None, None, None)
+			query_type = 'get_overviews'
+			overviews_query = DBQuery(None, None, None, None)
 			flo = sock.makefile(mode = 'wb')
 			pickle.dump(overviews_query, flo)
 			flo.flush()
@@ -184,15 +182,15 @@ def class_details_slot():
 	try:
 		with socket.socket() as sock:
 			sock.connect((host, port))
-			query_type = "getDetails"
-			details_query = cmv.Query(query_type, None, None, None, None, classid)
+			query_type = "get_detail"
+			details_query = [query_type, classid]
 			flo = sock.makefile(mode = 'wb')
 			pickle.dump(details_query, flo)
 			flo.flush()
 
 			flo = sock.makefile(mode = 'rb')
 			details = pickle.load(flo)
-			PyQt5.QtWidgets.QMessageBox.information(window, 'Class Details', details)
+			QtWidgets.QMessageBox.information(window, 'Class Details', details)
 			flo.flush()
 		
 	except Exception as ex:
@@ -203,10 +201,57 @@ def class_details_slot():
 
 class WorkerThread(threading.Thread):
 	
-    def __init__(self, host, port, dept, crsnum, area, title, event_queue):
+	def __init__(self, host, port, dept, crsnum, area, title, event_queue):
+		threading.Threading.__init__(self)
+		self._host = host
+		self._port = port
+		self._dept = dept
+		self._coursenum = crsnum
+		self._area = area
+		self._title = title
+		self._event_queue = event_queue
+		self._should_stop = False
+		
+	def stop(self):
+		self._should_stop = True
+		
+	def run(self):
+		try:
+			with socket.socket() as sock:
+				sock.connect((self._host, self._port))
+				portflow = sock.makefile(mode='wb')
+				pickle.dump(['get_overviews'(self._dept, self._coursenum, self._area, self._title)], portflow)
+				portflow.flush()
+				flo = sock.makefile(mode='rb')
+				overviews_output = pickle.load(flo)
+			if not self._should_stop:
+				self._event_queue.put((overviews_output))
+		except Exception as ex:
+			if not self._should_stop:
+				self._event_queue.put((False, str(ex)))
 
 #-----------------------------------------------------------------------
 
+def poll_event_queue_helper(event_queue, books_textedit):
+	while True:
+		try:
+			item = event_queue.get(block=False)
+		except queue.Empty:
+			break
+		books_textedit.clear()
+		successful, data = item
+		if successful:
+			books = data
+			if len(books) == 0:
+				books_textedit.insertPlainText('(None)')
+			else:
+				pattern = '<strong>%s</strong>: %s ($%.2f)<br>'
+				for book in books:
+					books_textedit.insertHtml(pattern % book.to_tuple())
+		else:
+			ex = data
+			books_textedit.insertPlainText(ex)
+			books_textedit.repaint()
 
 #-----------------------------------------------------------------------
 
@@ -219,28 +264,66 @@ def main():
 
 	host, port = get_arguments()
 	
-	app = PyQt5.QtWidgets.QApplication(sys.argv)
+	app = QtWidgets.QApplication(sys.argv)
 	
-	classes = PyQt5.QtWidgets.QListWidget()
-	#  classes.setFont(PyQt5.QtGui.QFont('Courier New', 10))
+	classes = QtWidgets.QListWidget()
+	#  classes.setFont(QtGui.QFont('Courier New', 10))
 	classes.doubleClicked.connect(class_details_slot)
 
-	control_frame = create_control_frame()
+	control_frame, dept_lineedit, crsnum_lineedit, area_lineedit, title_lineedit = create_control_frame()
 	output_frame = create_output_frame()
-	output_frame.setFont(PyQt5.QtGui.QFont('Courier New', 10))
+	output_frame.setFont(QtGui.QFont('Courier New', 10))
 	central_frame = create_central_frame(control_frame, output_frame)
 
 	# Main Window (Class Search) details
-	window = PyQt5.QtWidgets.QMainWindow()
+	window = QtWidgets.QMainWindow()
 	window.setWindowTitle('Princeton University Class Search')
 	window.setCentralWidget(central_frame)
-	screen_size = PyQt5.QtWidgets.QDesktopWidget().screenGeometry()
+	screen_size = QtWidgets.QDesktopWidget().screenGeometry()
 	window.resize(screen_size.width()//2, screen_size.height()//2)	
-	window.show()
 
-	launch()
+	# Create an event queue and a timer that polls it
+	event_queue = queue.Queue()
+
+	def poll_event_queue():
+		poll_event_queue_helper(event_queue, )
+	event_queue_timer = QtCore.QTimer()
+	event_queue_timer.timeout.connect(poll_event_queue)
+	event_queue_timer.setInterval(100) # milliseconds
+	event_queue_timer.start()
+
+	# Handle signals
+	worker_thread = None
+	def submit_slot():
+		nonlocal worker_thread
+		dept = dept_lineedit.text()
+		coursenum = crsnum_lineedit.text()
+		area = area_lineedit.text()
+		title = title_lineedit.text()
+		if worker_thread is not None:
+			worker_thread.stop()
+		worker_thread = WorkerThread(host, port, dept, coursenum, area, title, event_queue)
+		worker_thread.start()
+
+	debounce_timer = None
+	def debounced_submit_slot():
+		nonlocal debounce_timer
+		if debounce_timer is not None:
+			debounce_timer.cancel()
+		debounce_timer = threading.Timer(0.5, submit_slot)
+		debounce_timer.start()
+
+	dept_lineedit.textChanged.connect(debounced_submit_slot)
+	crsnum_lineedit.textChanged.connect(debounced_submit_slot)
+	area_lineedit.textChanged.connect(debounced_submit_slot)
+	title_lineedit.textChanged.connect(debounced_submit_slot)
+	
+	# Start up
+	window.show()
+	submit_slot()
 	classes.setCurrentRow(0)
 	sys.exit(app.exec_())
 
-if __name__ == '__main__':
-	main()
+#-----------------------------------------------------------------------
+if __name__ == '__main__':()
+main()
