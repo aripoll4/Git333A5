@@ -58,7 +58,7 @@ class ClientHandlerThread (threading.Thread):
 
 					querydict = queryinfo[1]
 					success, overviews = dbquery.a1reg(querydict['dept'], querydict['coursenum'], querydict['area'], querydict['title'])
-					pickle.dump((True, details), portflow)
+					pickle.dump((True, overviews), portflow)
 					# if success:
 					# 	pickle.dump((True, overviews), portflow)
 					# else:
