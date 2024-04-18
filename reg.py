@@ -122,31 +122,6 @@ def create_central_frame(control_frame, output_frame):
 
 #-----------------------------------------------------------------------
 
-def launch():
-	global classes
-	global host
-	global port
-
-	try:
-		with socket.socket() as sock:
-			sock.connect((host, port))
-			query_type = 'get_overviews'
-			overviews_query = DBQuery(None, None, None, None)
-			flo = sock.makefile(mode = 'wb')
-			pickle.dump(overviews_query, flo)
-			flo.flush()
-
-			flo = sock.makefile(mode = 'rb')
-			overviews = pickle.load(flo)
-			for row in overviews:
-				classes.addItem(row)
-			flo.flush()
-	except EOFError:
-		print(sys.argv[0] + ': End of File', file=sys.stderr)
-		sys.exit(1)
-
-#-----------------------------------------------------------------------
-
 def class_details_slot():
 	global classes
 	global host
