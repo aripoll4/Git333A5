@@ -86,7 +86,7 @@ class DBQuery:
 
                     cursor.execute(stmt_str, [classid])
                     row = cursor.fetchone()
-                    details = ""
+                    details = {}
                     
                     if row == None:
                         print('row is none')
@@ -96,12 +96,12 @@ class DBQuery:
                         #returns false, and an error string
 
                                            
-                    details += 'Course Id: ' + str(row[0]) + '\n\n'
-                    details += 'Days: ' + str(row[1]) + '\n'
-                    details += 'Start Time: ' + str(row[2]) + '\n'
-                    details += 'End Time: ' + str(row[3]) + '\n'
-                    details += 'Building: ' + str(row[4]) + '\n'
-                    details += 'Room: ' + str(row[5]) + '\n\n'
+                    details['courseid'] = str(row[0])
+                    details['days'] = str(row[1])
+                    details['starttime'] = str(row[2])
+                    details['endtime'] = str(row[3])
+                    details['bldg'] = str(row[4])
+                    details['roomnum'] = str(row[5])
                     
 
                     dept_str = 'SELECT dept, coursenum, courses.courseid'
@@ -112,17 +112,17 @@ class DBQuery:
                     dept_str += ' ORDER BY dept, coursenum'
                     cursor.execute(dept_str, [classid])
                     dept_row = cursor.fetchone()
-                    # depts_crsnum = []
+                    depts_crsnum = []
 
                     while dept_row is not None:
-                        details += 'Dept and Number: ' + str(dept_row[0]) + " " + str(dept_row[1]) + '\n'
+                        depts_crsnum.append[str(dept_row[0]), str(dept_row[1])]                        
                         dept_row = cursor.fetchone()
 
-                    details += '\n'
-                    details += 'Area: ' + str(row[8]) + '\n'
-                    details += 'Title: ' + str(row[9]) + '\n'
-                    details += 'Description: ' + str(row[10]) + '\n'
-                    details += 'Prereqs: ' + str(row[11]) + '\n'
+                    details['deptcoursenums'] = [depts_crsnum]                    
+                    details['area'] = str(row[8]) 
+                    details['title'] = str(row[9]) 
+                    details['descrip'] = str(row[10]) 
+                    details['prereqs'] = str(row[11])
 
                     profs_str = 'SELECT profname, coursesprofs.profid, classes.courseid'
                     profs_str += ' FROM profs, coursesprofs, classes '
@@ -133,10 +133,13 @@ class DBQuery:
 
                     cursor.execute(profs_str, [classid])
                     profs_row = cursor.fetchone()
+                    profs = []
 
                     while profs_row is not None:
-                        details += 'Professor: ' + str(profs_row[0]) + '\n'
+                        profs.append(str(profs_row[0]))                        
                         profs_row = cursor.fetchone()
+
+                    details['profnames'] = profs
 
                     return True, details
                     # returns true, and a list of details

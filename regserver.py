@@ -35,8 +35,7 @@ class ClientHandlerThread (threading.Thread):
 		print('Spawned child thread')
 		with self._sock:
 			try:
-				flo = self._sock.makefile(mode='rb')
-				# flo.write(query)
+				flo = self._sock.makefile(mode='rb')				
 				queryinfo = pickle.load(flo)
 				portflow = self._sock.makefile(mode = 'wb')
 
@@ -44,7 +43,8 @@ class ClientHandlerThread (threading.Thread):
 					print('Received command: get_detail')
 					consume_cpu_time(self._delay)
 					success, details = dbquery.a1regdetails(queryinfo[1])
-					pickle.dump((success, details), portflow)
+					details_output = [success, details]
+					pickle.dump(details_output, portflow)
 					# if success:
 					# 	pickle.dump((True, details), portflow)
 					# else:
@@ -58,7 +58,7 @@ class ClientHandlerThread (threading.Thread):
 
 					querydict = queryinfo[1]
 					success, overviews = dbquery.a1reg(querydict['dept'], querydict['coursenum'], querydict['area'], querydict['title'])
-					pickle.dump((success, overviews), portflow)
+					pickle.dump([success, overviews], portflow)
 					# if success:
 					# 	pickle.dump((True, overviews), portflow)
 					# else:
@@ -71,11 +71,7 @@ class ClientHandlerThread (threading.Thread):
 				print("Exiting child thread")
 
 			except Exception as ex:
-				print(ex, file = sys.stderr)
-				portflow = self._sock.makefile(mode='wb')
-				pickle.dump(ex, portflow)
-				portflow.flush()
-				sys.exit(1)
+				print(ex, file = sys.stderr)				
 
 		print('Closed socket in child thread')
 		print('Exiting child thread: ' + queryinfo)
@@ -98,15 +94,10 @@ def main():
 	try:
 		port = int(args.port)
 		delay = int(args.delay)
-	except Exception:
-		print(sys.argv[0] + ': Port/Delay must be an integer', file=sys.stderr)
-		sys.exit(2)
-
-	try:
 		server_sock = socket.socket()
-		
-		print('Opened server socket') 
+
 		server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)      
+		print('Opened server socket') 
 		server_sock.bind(('', port))
 		print('Bound server socket to port')
 		server_sock.listen()
@@ -114,10 +105,9 @@ def main():
 
 		while True:			
 			sock, _ = server_sock.accept()
-			with sock:
-				print('Accepted connection, opened socket')
-				client_handler_thread = ClientHandlerThread(sock, delay)
-				client_handler_thread.start()
+			print('Accepted connection, opened socket')
+			client_handler_thread = ClientHandlerThread(sock, delay)
+			client_handler_thread.start()
 
 				# process = multiprocessing.Process(target=handle_client, args=[sock, delay])
 				# process.start()

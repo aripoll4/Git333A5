@@ -88,6 +88,8 @@ def create_control_frame():
 
 	return control_frame, dept_lineedit, crsnum_lineedit, area_lineedit, title_lineedit
 
+#-----------------------------------------------------------------------
+
 def create_output_frame():
 	global classes
 
@@ -100,6 +102,8 @@ def create_output_frame():
 	output_frame.setLayout(output_layout)
 
 	return output_frame
+
+#-----------------------------------------------------------------------
 
 def create_central_frame(control_frame, output_frame):
 	# central frame layout
@@ -117,6 +121,8 @@ def create_central_frame(control_frame, output_frame):
 	central_frame.setLayout(central_layout)
 
 	return central_frame
+
+#-----------------------------------------------------------------------
 
 def launch():
 	global classes
@@ -166,6 +172,8 @@ def launch():
 # 		print(sys.argv[0] + ': End of File', file=sys.stderr)
 # 		sys.exit(1)
 
+#-----------------------------------------------------------------------
+
 def class_details_slot():
 	global classes
 	global host
@@ -191,6 +199,16 @@ def class_details_slot():
 		print(sys.argv[0] + ': ' + str(ex), file=sys.stderr)
 		sys.exit(1)
 
+#-----------------------------------------------------------------------
+
+class WorkerThread(threading.Thread):
+	
+    def __init__(self, host, port, )
+
+#-----------------------------------------------------------------------
+
+
+#-----------------------------------------------------------------------
 
 def main():
 
