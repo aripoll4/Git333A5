@@ -70,9 +70,6 @@ def create_control_frame():
 
 	control_layout.setColumnStretch(0, 0)
 	control_layout.setColumnStretch(1, 1)
-	control_layout.setColumnStretch(2, 0)
-	control_layout.setSpacing(6)
-	control_layout.setContentsMargins(0, 0, 0, 0)    # set contents margins (not default)
 
 	control_frame = QtWidgets.QFrame() # top section where we input queries
 	control_frame.setLayout(control_layout)
@@ -181,7 +178,8 @@ def poll_event_queue_helper(event_queue, classes):
 		if successful:
 			for course in overviews:
 				row = '%5s %3s %4s %3s %-40s' % (course['classid'], course['dept'], course['coursenum'], course['area'], course['title'])
-				classes.addItem(row)						
+				classes.addItem(row)
+			classes.setCurrentRow(0)						
 		else:
 			print(sys.argv[0] + overviews, file=sys.stderr)
 			sys.exit(1)
@@ -253,7 +251,6 @@ def main():
 	# Start up
 	window.show()
 	submit_slot()	
-	classes.setCurrentRow(0)
 	sys.exit(app.exec_())
 
 #-----------------------------------------------------------------------
