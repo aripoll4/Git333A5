@@ -42,15 +42,16 @@ class ClientHandlerThread (threading.Thread):
 				if queryinfo[0] == "get_detail":
 					print('Received command: get_detail')
 					consume_cpu_time(self._delay)
-					success, details = DBQuery.a1regdetails(queryinfo[1])
+					detail_query = queryinfo[1]					
+					success, details = DBQuery.a1regdetails(detail_query)
 					details_output = [success, details]
 					pickle.dump(details_output, portflow)
 					
 				else:
 					print('Received command: get_overviews')
 					consume_cpu_time(self._delay)
-					querydict = queryinfo[1]
-					success, overviews = DBQuery.a1reg(querydict['dept'], querydict['coursenum'], querydict['area'], querydict['title'])
+					overviews_query = queryinfo[1]
+					success, overviews = DBQuery.a1reg(overviews_query['dept'], overviews_query['coursenum'], overviews_query['area'], overviews_query['title'])
 					pickle.dump([success, overviews], portflow)
 
 				portflow.flush()

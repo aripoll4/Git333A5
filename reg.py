@@ -81,7 +81,7 @@ def create_control_frame():
 
 #-----------------------------------------------------------------------
 
-def create_output_frame():
+def create_output_frame(classes):
 	# output frame layout
 	output_layout = QtWidgets.QGridLayout()
 	output_layout.setContentsMargins(0, 0, 0, 0)    # set contents margins (not default)
@@ -110,22 +110,35 @@ def create_central_frame(control_frame, output_frame):
 
 #-----------------------------------------------------------------------
 
-def class_details_slot():
-	course = courses.currentItem()
-	classid = course('classid')
+def class_details_slot_helper(host, port, window, detail_overview):
+	# get selected items, 
+	# get text, strip spaces, split to convert it to words
+	# get the first item which is classid, convert to int
+	# courses = classes.selectedItems()
+	# if len(courses) != 1:
+	# 	print('Error: select one course')
 
+	# course = courses[0]
+	# # courseinfo = QtWidgets.QTextEdit().setText()
+	# courseinfo = course.text()
+	# courseinfo.strip()
+	# courseinfo.split()
+	classid = detail_overview[0]
+ 
 	try:
 		with socket.socket() as sock:
 			sock.connect((host, port))
-			details_query = ["get_detail", classid]
+			details_query = ["get_detail", int(classid)]
 			flo = sock.makefile(mode = 'wb')
 			pickle.dump(details_query, flo)
 			flo.flush()
 
 			flo = sock.makefile(mode = 'rb')
-			details = pickle.load(flo)
-			QtWidgets.QMessageBox.information(window, 'Class Details', details)
+			details = pickle.load(flo)			
+			class_details = str(details[1])
+			QtWidgets.QMessageBox.information(window, 'Class Details', class_details)
 			flo.flush()
+			return class_details
 		
 	except Exception as ex:
 		print(sys.argv[0] + ': ' + str(ex), file=sys.stderr)
@@ -168,18 +181,19 @@ class WorkerThread(threading.Thread):
 
 #-----------------------------------------------------------------------
 
-def poll_event_queue_helper(event_queue):
+def poll_event_queue_helper(event_queue, classes):
+
 	while True:
 		try:
 			item = event_queue.get(block=False)
 		except queue.Empty:
 			break
-		courses.clear()
-		successful, overviews = item
+		classes.clear()
+		successful, overviews = item		
 		if successful:
 			for course in overviews:
-				courses.insertItem(course)	
-				courses.setCurrentRow(0)		
+				row = '%5s %3s %4s %3s %-40s' % (course['classid'], course['dept'], course['coursenum'], course['area'], course['title'])
+				classes.addItem(row)						
 		else:
 			print(sys.argv[0] + overviews, file=sys.stderr)
 			sys.exit(1)
@@ -188,22 +202,14 @@ def poll_event_queue_helper(event_queue):
 
 def main():
 
-	global host
-	global port
-	global window
-	global courses
-	global classes
-
 	host, port = get_arguments()
 	
 	app = QtWidgets.QApplication(sys.argv)
 	
 	classes = QtWidgets.QListWidget()
-	courses = QtWidgets.QListWidgetItem	
-	classes.addItem(courses)
 
 	control_frame, dept_lineedit, crsnum_lineedit, area_lineedit, title_lineedit = create_control_frame()
-	output_frame = create_output_frame()
+	output_frame = create_output_frame(classes)
 	output_frame.setFont(QtGui.QFont('Courier New', 10))
 	central_frame = create_central_frame(control_frame, output_frame)
 
@@ -218,7 +224,7 @@ def main():
 	event_queue = queue.Queue()
 
 	def poll_event_queue():
-		poll_event_queue_helper(event_queue, )
+		poll_event_queue_helper(event_queue, classes)
 	event_queue_timer = QtCore.QTimer()
 	event_queue_timer.timeout.connect(poll_event_queue)
 	event_queue_timer.setInterval(100) # milliseconds
@@ -245,15 +251,21 @@ def main():
 		debounce_timer = threading.Timer(0.5, submit_slot)
 		debounce_timer.start()
 
+	# def details slot
+	# define outside main a helper function and into that pass classes
+	def class_details_slot():
+		class_details_slot_helper(host, port, window, classes.currentItem().text().strip().split())
+
 	dept_lineedit.textChanged.connect(debounced_submit_slot)
 	crsnum_lineedit.textChanged.connect(debounced_submit_slot)
 	area_lineedit.textChanged.connect(debounced_submit_slot)
 	title_lineedit.textChanged.connect(debounced_submit_slot)
-	classes.doubleClicked.connect(class_details_slot)
+	classes.itemActivated.connect(class_details_slot)
 	
 	# Start up
 	window.show()
 	submit_slot()	
+	classes.setCurrentRow(0)
 	sys.exit(app.exec_())
 
 #-----------------------------------------------------------------------

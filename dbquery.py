@@ -8,8 +8,6 @@
 import sys
 import sqlite3
 import contextlib
-import courseoverview
-import course as coursemod
 
 DATABASE_URL = 'file:reg.sqlite?mode=ro'
 
@@ -72,7 +70,7 @@ class DBQuery:
 
     @staticmethod
     def a1regdetails(classid):
-        print(classid)
+        # print(classid)
         try:
             with sqlite3.connect(DATABASE_URL, isolation_level=None,uri=True) as connection:
                 with contextlib.closing(connection.cursor()) as cursor:
@@ -95,14 +93,13 @@ class DBQuery:
                         #returns false, and an error string
 
                                            
-                    details['courseid'] = str(row[0])
-                    details['days'] = str(row[1])
+                    details['courseid'] = str(row[0]) 
+                    details['days'] = str(row[1]) 
                     details['starttime'] = str(row[2])
-                    details['endtime'] = str(row[3])
-                    details['bldg'] = str(row[4])
-                    details['roomnum'] = str(row[5])
+                    details['endtime'] = str(row[3]) 
+                    details['bldg'] = str(row[4]) 
+                    details['roomnum'] = str(row[5]) 
                     
-
                     dept_str = 'SELECT dept, coursenum, courses.courseid'
                     dept_str += ' FROM classes, crosslistings, courses'
                     dept_str += ' WHERE classes.courseid = courses.courseid'
@@ -114,14 +111,14 @@ class DBQuery:
                     depts_crsnum = []
 
                     while dept_row is not None:
-                        depts_crsnum.append[str(dept_row[0]), str(dept_row[1])]                        
+                        depts_crsnum.append([str(dept_row[0]), str(dept_row[1])])                       
                         dept_row = cursor.fetchone()
 
-                    details['deptcoursenums'] = [depts_crsnum]                    
+                    details['deptcoursenums'] = depts_crsnum 
                     details['area'] = str(row[8]) 
                     details['title'] = str(row[9]) 
                     details['descrip'] = str(row[10]) 
-                    details['prereqs'] = str(row[11])
+                    details['prereqs'] = str(row[11]) 
 
                     profs_str = 'SELECT profname, coursesprofs.profid, classes.courseid'
                     profs_str += ' FROM profs, coursesprofs, classes '
@@ -138,11 +135,11 @@ class DBQuery:
                         profs.append(str(profs_row[0]))                        
                         profs_row = cursor.fetchone()
 
-                    details['profnames'] = profs
+                    details['profnames'] = profs 
 
                     return True, details
                     # returns true, and a list of details
         except Exception as ex:
 
             print(ex, file=sys.stderr)
-            return False, ex
+            return False, details
