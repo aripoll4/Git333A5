@@ -110,19 +110,7 @@ def create_central_frame(control_frame, output_frame):
 
 #-----------------------------------------------------------------------
 
-def class_details_slot_helper(host, port, window, detail_overview):
-	# get selected items, 
-	# get text, strip spaces, split to convert it to words
-	# get the first item which is classid, convert to int
-	# courses = classes.selectedItems()
-	# if len(courses) != 1:
-	# 	print('Error: select one course')
-
-	# course = courses[0]
-	# # courseinfo = QtWidgets.QTextEdit().setText()
-	# courseinfo = course.text()
-	# courseinfo.strip()
-	# courseinfo.split()
+def class_details_slot_helper(host, port, window, detail_overview):	
 	classid = detail_overview[0]
  
 	try:
@@ -138,7 +126,6 @@ def class_details_slot_helper(host, port, window, detail_overview):
 			class_details = str(details[1])
 			QtWidgets.QMessageBox.information(window, 'Class Details', class_details)
 			flo.flush()
-			return class_details
 		
 	except Exception as ex:
 		print(sys.argv[0] + ': ' + str(ex), file=sys.stderr)
@@ -252,7 +239,7 @@ def main():
 		debounce_timer.start()
 
 	# def details slot
-	# define outside main a helper function and into that pass classes
+	# outside main define a helper function and into that pass classes
 	def class_details_slot():
 		class_details_slot_helper(host, port, window, classes.currentItem().text().strip().split())
 
