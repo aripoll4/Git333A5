@@ -124,6 +124,7 @@ def class_details_slot_helper(host, port, window, detail_overview):
 			flo = sock.makefile(mode = 'rb')
 			details = pickle.load(flo)			
 			class_details = str(details[1])
+			# may need to format class details here before creating the message box
 			QtWidgets.QMessageBox.information(window, 'Class Details', class_details)
 			flo.flush()
 		
