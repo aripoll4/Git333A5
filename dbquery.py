@@ -60,11 +60,11 @@ class DBQuery:
                         row = cursor.fetchone()
                     
                     return True, overviews
-                    # returns 'get_overviews', and a list of overviews
-
+                
         except Exception as ex:
-            print(str(ex), file=sys.stderr)
-            return False, str(ex)
+            error = "A server error occured. Please contact the system administrator."
+            print(error, file=sys.stderr)
+            return False, ex
 
     #----------------------------------------------------------------------
 
@@ -85,13 +85,11 @@ class DBQuery:
                     row = cursor.fetchone()
                     details = {}
                     
-                    if row == None:
+                    if row is None:
                         print('row is none')
                         err_str = "Non-existing classid"
                         print(err_str, file=sys.stderr)
                         return False, err_str 
-                        #returns false, and an error string
-
                                            
                     details['courseid'] = str(row[0]) 
                     details['days'] = str(row[1]) 
@@ -139,7 +137,7 @@ class DBQuery:
 
                     return True, details
                     # returns true, and a list of details
-        except Exception as ex:
-
-            print(ex, file=sys.stderr)
-            return False, details
+        except Exception:
+            error = "A server error occured. Please contact the system administrator."
+            print(error, file=sys.stderr)
+            return False, error

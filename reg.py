@@ -27,9 +27,12 @@ def get_arguments():
 	try:
 		host = args.host
 		port = int(args.port)
+	except argparse.ArgumentError as arg_ex:
+		print(arg_ex, file=sys.stderr)
+		sys.exit(2)
 	except Exception as ex:
 		print(ex, file=sys.stderr)
-		sys.exit(2)
+		sys.exit(1)
 
 	return host, port
 
@@ -120,23 +123,50 @@ def class_details_slot_helper(host, port, window, detail_overview):
 
 			flo = sock.makefile(mode = 'rb')
 			details = pickle.load(flo)			
-			class_details = str(details[1])
-			# may need to format class details here before creating the message box
-			QtWidgets.QMessageBox.information(window, 'Class Details', class_details)
+			class_details = details[1]
+
+			if details[0] is True:
+				detail_data = "Course Id: " + str(class_details['courseid']) + '\n \n'
+				detail_data += "Days: " + str(class_details['days']) + '\n'
+				detail_data += "Start tim: " + str(class_details['starttime']) + '\n'
+				detail_data += "End Time: " + str(class_details['endtime']) + '\n'
+				detail_data += "Building: " + str(class_details['bldg']) + '\n'
+				detail_data += "Room: " + str(class_details['roomnum']) + '\n \n'
+				
+				for item in class_details['deptcoursenums']:
+					detail_data += "Dept and Number: " + item[0] + ' ' + item[1] + '\n'
+				detail_data += '\n'
+					
+				detail_data += "Area: " + str(class_details['area']) + '\n \n'
+				detail_data += "Title: " + str(class_details['title']) + '\n \n'
+				detail_data += "Description: " + str(class_details['descrip']) + '\n \n'
+				detail_data += "Prerequisites: " + str(class_details['prereqs']) + '\n \n'
+
+				for profitem in class_details['profnames']:
+					detail_data += "Professor: " + str(profitem) + '\n'
+	
+				QtWidgets.QMessageBox.information(window, 'Class Details', detail_data)
+			else:
+				if class_details == "Non-existing classid":
+					error_msg = "No class with classid " + classid + " exists."
+				else:
+					error_msg = "A server error occured. Please contact the system administrator."
+				QtWidgets.QMessageBox.information(window, 'Error', error_msg)
+
 			flo.flush()
 		
 	except Exception as ex:
-		print(sys.argv[0] + ': ' + str(ex), file=sys.stderr)
-		sys.exit(1)
+		QtWidgets.QMessageBox.information(window, 'Unavailable server', ex)
 
 #-----------------------------------------------------------------------
 
 class WorkerThread(threading.Thread):
 	
-	def __init__(self, host, port, dept, crsnum, area, title, event_queue):
+	def __init__(self, host, port, window, dept, crsnum, area, title, event_queue):
 		threading.Thread.__init__(self)
 		self._host = host
-		self._port = port		
+		self._port = port
+		self._window = window		
 		self._dept = dept
 		self._coursenum = crsnum
 		self._area = area
@@ -163,6 +193,7 @@ class WorkerThread(threading.Thread):
 		except Exception as ex:
 			if not self._should_stop:
 				self._event_queue.put((False, str(ex)))
+				QtWidgets.QMessageBox.information(self._window, 'Unavailable server', ex)
 
 #-----------------------------------------------------------------------
 
@@ -226,7 +257,7 @@ def main():
 		title = title_lineedit.text()
 		if worker_thread is not None:
 			worker_thread.stop()
-		worker_thread = WorkerThread(host, port, dept, coursenum, area, title, event_queue)
+		worker_thread = WorkerThread(host, port, window, dept, coursenum, area, title, event_queue)
 		worker_thread.start()
 
 	debounce_timer = None

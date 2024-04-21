@@ -44,6 +44,10 @@ class ClientHandlerThread (threading.Thread):
 					consume_cpu_time(self._delay)
 					detail_query = queryinfo[1]					
 					success, details = DBQuery.a1regdetails(detail_query)
+					if success == False:
+						if details == "Non-existing classid":
+							error_msg = "No class with classid " + detail_query + " exists."
+							print(error_msg, file=sys.stderr)
 					details_output = [success, details]
 					pickle.dump(details_output, portflow)
 					
@@ -67,11 +71,7 @@ class ClientHandlerThread (threading.Thread):
 
 #-----------------------------------------------------------------------
 
-def main():
-	if len(sys.argv) != 3:
-		print(': Usage: python %s port' % sys.argv[0], file=sys.stderr)
-		sys.exit(1)
-		
+def main():		
 	parser = argparse.ArgumentParser(description = 'Server for regristrar application', allow_abbrev=False)
 	parser.add_argument('port', type=int, help='the port at which the server should listen')
 	parser.add_argument('delay', type=int, help='the number of seconds that the server should delay before responding to each client request')
@@ -82,7 +82,6 @@ def main():
 		port = int(args.port)
 		delay = int(args.delay)
 		server_sock = socket.socket()
-
 		server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)      
 		print('Opened server socket') 
 		server_sock.bind(('', port))
@@ -95,8 +94,11 @@ def main():
 			print('Accepted connection, opened socket')
 			client_handler_thread = ClientHandlerThread(sock, delay)
 			client_handler_thread.start()
+	except argparse.ArgumentError as arg_ex:
+		print(arg_ex, file=sys.stderr)
+		sys.exit(2)
 	except Exception as ex:
-		print(sys.argv[0] + ': ' + str(ex), file=sys.stderr)
+		print(ex, file=sys.stderr)
 		sys.exit(1)
 
 #-----------------------------------------------------------------------
