@@ -5,7 +5,6 @@
 # Authors: Wangari Karani & Alfred Ripoll
 #-----------------------------------------------------------------------
 
-# import cmv
 import sys
 import queue 
 import socket

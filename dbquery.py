@@ -2,7 +2,7 @@
 
 #----------------------------------------------------
 # dbquery.py
-# Authors: Author: Wangari Karani, Alfred Ripoll               
+# Authors: Wangari Karani, Alfred Ripoll               
 #----------------------------------------------------
 
 import sys

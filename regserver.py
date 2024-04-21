@@ -5,15 +5,13 @@
 # Authors: Wangari Karani & Alfred Ripoll
 #-----------------------------------------------------------------------
 
-# import os
 import sys
 import time
 import socket
 import pickle
-from dbquery import DBQuery
 import argparse
 import threading
-# import multiprocessing
+from dbquery import DBQuery
 
 #-----------------------------------------------------------------------
 
